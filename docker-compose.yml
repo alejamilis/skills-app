@@ -1,0 +1,49 @@
+version: "3.5"
+
+volumes:
+  flask-db:
+
+networks:
+  fluxit:
+   name: fluxit
+
+services:
+  database:
+    container_name: database
+    image: mysql:5.7
+    restart: always
+    hostname: database
+    networks:
+      - fluxit
+    environment:
+      MYSQL_DATABASE: database_name
+      MYSQL_USER: username
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3307:3306"
+    expose:
+      - "3306"
+    volumes:
+      - flask-db:/var/lib/mysql
+
+  server:
+    container_name: skills_app
+    build: .
+    hostname: skills_app
+    networks:
+      - fluxit
+    ports:
+      - "5000:5000"
+    volumes: [".:/usr/src/app"]
+    restart: always
+    depends_on:
+      - database
+    environment:
+      ENV: DEVELOPMENT
+      DB_USERNAME: username
+      DB_PASSWORD: password
+      DB_DATABASE: database_name
+      DB_HOST: database
+      DB_PORT: 3306
+
