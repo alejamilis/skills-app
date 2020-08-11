@@ -1,16 +1,18 @@
 from config import Config
 
 from flask import Flask
+from flask_cors import CORS, cross_origin
 from flask_graphql import GraphQLView
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+app = Flask(__name__)
+cors = CORS(app)
 
 def create_app():
-    app = Flask(__name__)
-
     # Obtener la configuracion del ambiente elegido
     app.config.from_object(get_environment_config())
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     # Inicializa la conexion a la BD
     db.init_app(app)
@@ -35,6 +37,7 @@ def create_app():
         db.session.remove()
 
     @app.route("/")
+    @cross_origin()
     def test():
         return "Test ok!"
 
